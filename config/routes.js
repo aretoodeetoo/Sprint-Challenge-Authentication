@@ -28,8 +28,8 @@ function createToken(user) {
 
 function register(req, res) {
   // implement user registration
-  let user = req.body;
-  const hash = bcrypt.hashSync(user.password, 16);
+  const user = req.body;
+  const hash = bcrypt.hashSync(user.password, 10);
   user.password = hash;
   db('users')
     .insert(user)
@@ -37,12 +37,22 @@ function register(req, res) {
       res.status(200).json({ message: 'User registered!'});
     })
     .catch(err => {
-      res.status(500).json({ message: 'Unable to register user. '});
+      res.status(500).json({ message: 'Unable to register user.'});
     })
 }
 
-function login(req, res) {
+async function login(req, res) {
   // implement user login
+  const verify = req.body;
+  const user = await db('users')
+    .where({ username: verify.username })
+    .first();
+  if (user && bcrypt.compareSync(verify.password, user.password)) {
+    const token = createToken(user);
+    res.status(200).json({ message: 'Log in successful!', token });
+  } else {
+    res.status(401).json({ message: 'Incorrect username or password '});
+  }
 }
 
 function getJokes(req, res) {
