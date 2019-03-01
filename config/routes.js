@@ -29,8 +29,16 @@ function createToken(user) {
 function register(req, res) {
   // implement user registration
   let user = req.body;
-  const hash = bcrypt.hashSync(user.password, 10);
+  const hash = bcrypt.hashSync(user.password, 16);
   user.password = hash;
+  db('users')
+    .insert(user)
+    .then(res => {
+      res.status(200).json({ message: 'User registered!'});
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Unable to register user. '});
+    })
 }
 
 function login(req, res) {
