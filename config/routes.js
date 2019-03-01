@@ -16,12 +16,14 @@ function createToken(user) {
     subject: user.id,
     username: user.username
   };
+
+  const jwtSecret = process.env.JWT_SECRET;
   
   const options = {
     expiresIn: '1d'
   };
 
-  return jwt.sign(payload, secrets.jwtSecret, options);
+  return jwt.sign(payload, jwtSecret, options);
 }
 
 function register(req, res) {
